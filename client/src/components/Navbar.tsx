@@ -41,26 +41,18 @@ const Navbar = () => {
               <span className="ml-2 text-xl font-bold tracking-wider">BARBESHOP</span>
             </div>
             <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-              <Link href="/">
-                <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                  Home
-                </a>
+              <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                Home
               </Link>
-              <Link href="/about-us">
-                <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                  About Us
-                </a>
+              <Link href="/about-us" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                About Us
               </Link>
-              <Link href="/booking">
-                <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                  Book Now
-                </a>
+              <Link href="/booking" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                Book Now
               </Link>
               {user && user.role !== 'client' && (
-                <Link href="/dashboard">
-                  <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/dashboard" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                    Dashboard
-                  </a>
+                <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/dashboard" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                  Dashboard
                 </Link>
               )}
             </div>
@@ -68,15 +60,11 @@ const Navbar = () => {
           <div className="flex items-center">
             {!user ? (
               <div className="flex space-x-2">
-                <Link href="/login">
-                  <a className="px-4 py-2 text-sm font-medium text-white hover:bg-primary-light rounded-md">
-                    Login
-                  </a>
+                <Link href="/login" className="px-4 py-2 text-sm font-medium text-white hover:bg-primary-light rounded-md">
+                  Login
                 </Link>
-                <Link href="/register">
-                  <a className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md hover:bg-amber-700">
-                    Register
-                  </a>
+                <Link href="/register" className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md hover:bg-amber-700">
+                  Register
                 </Link>
               </div>
             ) : (
@@ -97,15 +85,15 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     {user.role === 'client' && (
                       <DropdownMenuItem asChild>
-                        <Link href="/booking">
-                          <a className="w-full cursor-pointer">My Appointments</a>
+                        <Link href="/booking" className="w-full cursor-pointer">
+                          My Appointments
                         </Link>
                       </DropdownMenuItem>
                     )}
                     {user.role !== 'client' && (
                       <DropdownMenuItem asChild>
-                        <Link href="/dashboard">
-                          <a className="w-full cursor-pointer">Dashboard</a>
+                        <Link href="/dashboard" className="w-full cursor-pointer">
+                          Dashboard
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -142,26 +130,18 @@ const Navbar = () => {
       {/* Mobile menu */}
       <div className={`${mobileMenuOpen ? "block" : "hidden"} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <Link href="/">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-              Home
-            </a>
+          <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+            Home
           </Link>
-          <Link href="/about-us">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-              About Us
-            </a>
+          <Link href="/about-us" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+            About Us
           </Link>
-          <Link href="/booking">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-              Book Now
-            </a>
+          <Link href="/booking" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+            Book Now
           </Link>
           {user && user.role !== 'client' && (
-            <Link href="/dashboard">
-              <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/dashboard" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                Dashboard
-              </a>
+            <Link href="/dashboard" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/dashboard" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+              Dashboard
             </Link>
           )}
         </div>
@@ -179,10 +159,8 @@ const Navbar = () => {
             </div>
             <div className="mt-3 px-2 space-y-1">
               {user.role === 'client' && (
-                <Link href="/booking">
-                  <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-dark hover:text-white hover:bg-primary-light">
-                    My Appointments
-                  </a>
+                <Link href="/booking" className="block px-3 py-2 rounded-md text-base font-medium text-neutral-dark hover:text-white hover:bg-primary-light">
+                  My Appointments
                 </Link>
               )}
               <button

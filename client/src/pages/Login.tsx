@@ -51,11 +51,12 @@ const Login = () => {
       });
       
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error instanceof Error ? error.message : "Invalid email or password";
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: error.message || "Invalid email or password",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -91,10 +92,8 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#">
-                  <a className="text-sm text-amber-600 hover:text-amber-700">
-                    Forgot password?
-                  </a>
+                <Link href="#" className="text-sm text-amber-600 hover:text-amber-700">
+                  Forgot password?
                 </Link>
               </div>
               <Input
@@ -126,10 +125,8 @@ const Login = () => {
             </Button>
             <p className="mt-4 text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/register">
-                <a className="font-medium text-amber-600 hover:text-amber-700">
-                  Create an account
-                </a>
+              <Link href="/register" className="font-medium text-amber-600 hover:text-amber-700">
+                Create an account
               </Link>
             </p>
           </CardFooter>

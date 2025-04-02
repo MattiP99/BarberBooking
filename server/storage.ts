@@ -41,6 +41,7 @@ export interface IStorage {
   updateTimeSlot(id: number, timeSlot: Partial<InsertTimeSlot>): Promise<TimeSlot | undefined>;
 }
 
+// In-memory storage implementation
 export class MemStorage implements IStorage {
   private _users: Map<number, User>;
   private _services: Map<number, Service>;
@@ -68,11 +69,15 @@ export class MemStorage implements IStorage {
     this.currentTimeSlotId = 1;
     
     // Initialize with some default data
-    this.seedData();
+    // We can't await in constructor, but this is fine for MemStorage
+    // as everything is synchronous in-memory operations
+    this.seedData().catch(err => {
+      console.error('Error seeding data:', err);
+    });
   }
 
   // Seed initial data
-  private seedData() {
+  private async seedData() {
     // Add default services
     const services: InsertService[] = [
       // Men's services
@@ -86,10 +91,11 @@ export class MemStorage implements IStorage {
       { name: 'Hair Coloring', type: 'womens-color', description: 'Professional coloring service using premium products to achieve vibrant, long-lasting results.', price: 6500, duration: 90, image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' }
     ];
     
-    services.forEach(service => this.createService(service));
+    // Create services
+    await Promise.all(services.map(service => this.createService(service)));
     
     // Add admin user
-    this.createUser({
+    const adminUser = await this.createUser({
       username: 'admin',
       email: 'admin@barbeshop.com',
       password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
@@ -99,7 +105,7 @@ export class MemStorage implements IStorage {
     });
     
     // Add barber users
-    const marcoUser = this.createUser({
+    const marcoUser = await this.createUser({
       username: 'marco',
       email: 'marco@barbeshop.com',
       password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
@@ -108,14 +114,14 @@ export class MemStorage implements IStorage {
       phone: '+1234567891'
     });
     
-    this.createBarber({
+    await this.createBarber({
       userId: marcoUser.id,
       speciality: 'Master Barber',
       bio: 'With over 15 years of experience, Marco specializes in classic cuts and precision beard styling. His attention to detail ensures each client leaves looking their best.',
       image: 'https://images.unsplash.com/photo-1534368786749-b63e05c90863?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=500&q=80'
     });
     
-    const lucaUser = this.createUser({
+    const lucaUser = await this.createUser({
       username: 'luca',
       email: 'luca@barbeshop.com',
       password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
@@ -124,7 +130,7 @@ export class MemStorage implements IStorage {
       phone: '+1234567892'
     });
     
-    this.createBarber({
+    await this.createBarber({
       userId: lucaUser.id,
       speciality: 'Style Specialist',
       bio: 'Luca brings modern techniques and trendy styles to our shop. His expertise in contemporary cuts and styling makes him a favorite for clients looking for the latest trends.',
@@ -132,7 +138,7 @@ export class MemStorage implements IStorage {
     });
     
     // Add regular user
-    this.createUser({
+    await this.createUser({
       username: 'customer',
       email: 'customer@example.com',
       password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
@@ -158,7 +164,18 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const now = new Date();
-    const user: User = { ...insertUser, id, createdAt: now };
+    
+    // Ensure all required fields are provided with default values
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: now,
+      role: insertUser.role || 'client',
+      fullName: insertUser.fullName || null,
+      phone: insertUser.phone || null,
+      profileImage: insertUser.profileImage || null
+    };
+    
     this._users.set(id, user);
     return user;
   }
@@ -183,7 +200,15 @@ export class MemStorage implements IStorage {
 
   async createService(insertService: InsertService): Promise<Service> {
     const id = this.currentServiceId++;
-    const service: Service = { ...insertService, id };
+    
+    // Ensure all required fields have values
+    const service: Service = { 
+      ...insertService, 
+      id,
+      description: insertService.description || null,
+      image: insertService.image || null
+    };
+    
     this._services.set(id, service);
     return service;
   }
@@ -203,7 +228,17 @@ export class MemStorage implements IStorage {
 
   async createBarber(insertBarber: InsertBarber): Promise<Barber> {
     const id = this.currentBarberId++;
-    const barber: Barber = { ...insertBarber, id };
+    
+    // Ensure all required fields have values
+    const barber: Barber = { 
+      ...insertBarber, 
+      id,
+      userId: insertBarber.userId || null,
+      speciality: insertBarber.speciality || null,
+      bio: insertBarber.bio || null,
+      image: insertBarber.image || null
+    };
+    
     this._barbers.set(id, barber);
     return barber;
   }
@@ -228,7 +263,16 @@ export class MemStorage implements IStorage {
   async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
     const id = this.currentAppointmentId++;
     const now = new Date();
-    const appointment: Appointment = { ...insertAppointment, id, createdAt: now };
+    
+    // Ensure all required fields have values
+    const appointment: Appointment = { 
+      ...insertAppointment, 
+      id, 
+      createdAt: now,
+      status: insertAppointment.status || 'pending',
+      notes: insertAppointment.notes || null
+    };
+    
     this._appointments.set(id, appointment);
     return appointment;
   }
@@ -267,7 +311,14 @@ export class MemStorage implements IStorage {
 
   async createTimeSlot(insertTimeSlot: InsertTimeSlot): Promise<TimeSlot> {
     const id = this.currentTimeSlotId++;
-    const timeSlot: TimeSlot = { ...insertTimeSlot, id };
+    
+    // Ensure all required fields have values
+    const timeSlot: TimeSlot = { 
+      ...insertTimeSlot, 
+      id,
+      isBooked: insertTimeSlot.isBooked !== undefined ? insertTimeSlot.isBooked : false
+    };
+    
     this._timeSlots.set(id, timeSlot);
     return timeSlot;
   }
@@ -282,4 +333,27 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Initialize the storage based on environment 
+let storageInstance: IStorage;
+
+// This function allows us to dynamically switch the storage implementation
+export function initializeStorage(useDatabase = false): IStorage {
+  if (useDatabase) {
+    import('./pgStorage.js').then(module => {
+      const { PgStorage } = module;
+      storageInstance = new PgStorage();
+      console.log('Using PostgreSQL storage');
+    }).catch(err => {
+      console.error('Error importing PgStorage:', err);
+      storageInstance = new MemStorage();
+      console.log('Falling back to in-memory storage due to import error');
+    });
+  } else {
+    storageInstance = new MemStorage();
+    console.log('Using in-memory storage');
+  }
+  return storageInstance;
+}
+
+// Use PostgreSQL database
+export const storage = initializeStorage(true);

@@ -1,6 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { testConnection, initializeDatabase } from "./db";
+import { PgStorage } from "./pgStorage";
+import { initializeStorage } from "./storage";
+import { config } from 'dotenv';
 
 const app = express();
 app.use(express.json());
@@ -37,6 +41,30 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Load environment variables
+  config();
+
+  // Initialize and connect to the database
+  log('Initializing database connection...');
+  try {
+    const dbConnected = await testConnection();
+    if (dbConnected) {
+      // Initialize database schema
+      await initializeDatabase();
+      
+      // Create and seed the PostgreSQL storage
+      const pgStorage = new PgStorage();
+      await pgStorage.seedData();
+      
+      log('Database initialized successfully');
+    } else {
+      log('Failed to connect to database, falling back to in-memory storage', 'warning');
+    }
+  } catch (error) {
+    log(`Database initialization error: ${error}`, 'error');
+    log('Continuing with in-memory storage', 'warning');
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

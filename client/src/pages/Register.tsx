@@ -58,7 +58,13 @@ const Register = () => {
     
     setIsLoading(true);
     try {
-      await registerUser(values);
+      // Make sure fullName and phone are strings or undefined, not null
+      const userData = {
+        ...values,
+        fullName: values.fullName || undefined,
+        phone: values.phone || undefined
+      };
+      await registerUser(userData);
       
       toast({
         title: "Registration successful",
@@ -67,10 +73,14 @@ const Register = () => {
       
       navigate("/");
     } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "There was a problem creating your account";
+      
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: error.message || "There was a problem creating your account",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -174,7 +184,7 @@ const Register = () => {
                 onCheckedChange={(checked) => setTermsAgreed(checked as boolean)}
               />
               <Label htmlFor="terms" className="text-sm font-normal">
-                I agree to the <Link href="#"><a className="text-amber-600 hover:text-amber-700">terms and conditions</a></Link>
+                I agree to the <Link href="#" className="text-amber-600 hover:text-amber-700">terms and conditions</Link>
               </Label>
             </div>
           </CardContent>
@@ -191,10 +201,8 @@ const Register = () => {
             </Button>
             <p className="mt-4 text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login">
-                <a className="font-medium text-amber-600 hover:text-amber-700">
-                  Sign in
-                </a>
+              <Link href="/login" className="font-medium text-amber-600 hover:text-amber-700">
+                Sign in
               </Link>
             </p>
           </CardFooter>

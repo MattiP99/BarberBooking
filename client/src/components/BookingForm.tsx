@@ -226,7 +226,7 @@ const BookingForm = () => {
                 <p className="text-red-500">Error loading services: {servicesQuery.error.message}</p>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {servicesQuery.data.map((service: Service) => (
+                  {servicesQuery.data?.map((service: Service) => (
                     <ServiceCard
                       key={service.id}
                       service={service}
@@ -280,7 +280,7 @@ const BookingForm = () => {
                 <p className="text-red-500">Error loading barbers: {barbersQuery.error.message}</p>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2">
-                  {barbersQuery.data.map((barber: Barber) => (
+                  {barbersQuery.data?.map((barber: Barber) => (
                     <BarberCard
                       key={barber.id}
                       barber={barber}
@@ -344,14 +344,14 @@ const BookingForm = () => {
                     </div>
                   ) : timeSlotsQuery.isError ? (
                     <p className="text-red-500">Error loading time slots: {timeSlotsQuery.error.message}</p>
-                  ) : timeSlotsQuery.data.length === 0 ? (
+                  ) : timeSlotsQuery.data?.length === 0 ? (
                     <div className="text-center p-8 text-gray-500 border border-dashed rounded-lg">
                       No time slots available for this date
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                       {timeSlotsQuery.data
-                        .filter((slot: TimeSlot) => !slot.isBooked)
+                        ?.filter((slot: TimeSlot) => !slot.isBooked)
                         .map((slot: TimeSlot) => {
                           const timeStr = parseTimeSlot(slot.startTime);
                           return (

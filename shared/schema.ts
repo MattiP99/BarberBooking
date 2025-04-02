@@ -1,5 +1,6 @@
 import { pgTable, text, serial, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 // User role enumeration
@@ -154,3 +155,47 @@ export const appointmentWithDetailsSchema = z.object({
 });
 
 export type AppointmentWithDetails = z.infer<typeof appointmentWithDetailsSchema>;
+
+// Define table relations
+export const usersRelations = relations(users, ({ many, one }) => ({
+  appointments: many(appointments),
+  barber: one(barbers, {
+    fields: [users.id],
+    references: [barbers.userId],
+  }),
+}));
+
+export const barbersRelations = relations(barbers, ({ one, many }) => ({
+  user: one(users, {
+    fields: [barbers.userId],
+    references: [users.id],
+  }),
+  appointments: many(appointments),
+  timeSlots: many(timeSlots),
+}));
+
+export const servicesRelations = relations(services, ({ many }) => ({
+  appointments: many(appointments),
+}));
+
+export const appointmentsRelations = relations(appointments, ({ one }) => ({
+  user: one(users, {
+    fields: [appointments.userId],
+    references: [users.id],
+  }),
+  barber: one(barbers, {
+    fields: [appointments.barberId],
+    references: [barbers.id],
+  }),
+  service: one(services, {
+    fields: [appointments.serviceId],
+    references: [services.id],
+  }),
+}));
+
+export const timeSlotsRelations = relations(timeSlots, ({ one }) => ({
+  barber: one(barbers, {
+    fields: [timeSlots.barberId],
+    references: [barbers.id],
+  }),
+}));
