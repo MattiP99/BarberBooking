@@ -333,27 +333,291 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Initialize the storage based on environment 
-let storageInstance: IStorage;
+import { db } from "./db";
+import { eq, sql } from "drizzle-orm";
 
-// This function allows us to dynamically switch the storage implementation
-export function initializeStorage(useDatabase = false): IStorage {
-  if (useDatabase) {
-    import('./pgStorage.js').then(module => {
-      const { PgStorage } = module;
-      storageInstance = new PgStorage();
-      console.log('Using PostgreSQL storage');
-    }).catch(err => {
-      console.error('Error importing PgStorage:', err);
-      storageInstance = new MemStorage();
-      console.log('Falling back to in-memory storage due to import error');
-    });
-  } else {
-    storageInstance = new MemStorage();
-    console.log('Using in-memory storage');
+// DatabaseStorage implementation for PostgreSQL
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
-  return storageInstance;
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+  
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser || undefined;
+  }
+  
+  // Service operations
+  async getServices(): Promise<Service[]> {
+    return await db.select().from(services);
+  }
+  
+  async getService(id: number): Promise<Service | undefined> {
+    const [service] = await db.select().from(services).where(eq(services.id, id));
+    return service || undefined;
+  }
+  
+  async createService(insertService: InsertService): Promise<Service> {
+    const [service] = await db.insert(services).values(insertService).returning();
+    return service;
+  }
+  
+  // Barber operations
+  async getBarbers(): Promise<Barber[]> {
+    return await db.select().from(barbers);
+  }
+  
+  async getBarber(id: number): Promise<Barber | undefined> {
+    const [barber] = await db.select().from(barbers).where(eq(barbers.id, id));
+    return barber || undefined;
+  }
+  
+  async getBarberByUserId(userId: number): Promise<Barber | undefined> {
+    const [barber] = await db.select().from(barbers).where(eq(barbers.userId, userId));
+    return barber || undefined;
+  }
+  
+  async createBarber(insertBarber: InsertBarber): Promise<Barber> {
+    const [barber] = await db.insert(barbers).values(insertBarber).returning();
+    return barber;
+  }
+  
+  // Appointment operations
+  async getAppointments(): Promise<Appointment[]> {
+    return await db.select().from(appointments);
+  }
+  
+  async getAppointment(id: number): Promise<Appointment | undefined> {
+    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    return appointment || undefined;
+  }
+  
+  async getAppointmentsByUser(userId: number): Promise<Appointment[]> {
+    return await db.select().from(appointments).where(eq(appointments.userId, userId));
+  }
+  
+  async getAppointmentsByBarber(barberId: number): Promise<Appointment[]> {
+    return await db.select().from(appointments).where(eq(appointments.barberId, barberId));
+  }
+  
+  async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
+    const [appointment] = await db.insert(appointments).values(insertAppointment).returning();
+    return appointment;
+  }
+  
+  async updateAppointment(id: number, appointmentData: Partial<InsertAppointment>): Promise<Appointment | undefined> {
+    const [updatedAppointment] = await db
+      .update(appointments)
+      .set(appointmentData)
+      .where(eq(appointments.id, id))
+      .returning();
+    return updatedAppointment || undefined;
+  }
+  
+  async deleteAppointment(id: number): Promise<boolean> {
+    const [deletedAppointment] = await db
+      .delete(appointments)
+      .where(eq(appointments.id, id))
+      .returning();
+    return !!deletedAppointment;
+  }
+  
+  // Time slot operations
+  async getTimeSlots(barberId: number, date: Date): Promise<TimeSlot[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    // Use a single where condition with AND to filter by date range
+    return await db
+      .select()
+      .from(timeSlots)
+      .where(
+        sql`${timeSlots.barberId} = ${barberId} AND 
+            ${timeSlots.startTime} >= ${startOfDay} AND 
+            ${timeSlots.startTime} <= ${endOfDay}`
+      );
+  }
+  
+  async getTimeSlot(id: number): Promise<TimeSlot | undefined> {
+    const [timeSlot] = await db.select().from(timeSlots).where(eq(timeSlots.id, id));
+    return timeSlot || undefined;
+  }
+  
+  async createTimeSlot(insertTimeSlot: InsertTimeSlot): Promise<TimeSlot> {
+    const [timeSlot] = await db.insert(timeSlots).values(insertTimeSlot).returning();
+    return timeSlot;
+  }
+  
+  async updateTimeSlot(id: number, timeSlotData: Partial<InsertTimeSlot>): Promise<TimeSlot | undefined> {
+    const [updatedTimeSlot] = await db
+      .update(timeSlots)
+      .set(timeSlotData)
+      .where(eq(timeSlots.id, id))
+      .returning();
+    return updatedTimeSlot || undefined;
+  }
+  
+  // Method to seed initial data
+  async seedData(): Promise<void> {
+    try {
+      // Check if we already have users
+      const existingUsers = await db.select().from(users);
+      if (existingUsers.length > 0) {
+        console.log('Database already seeded, skipping seed operation');
+        return;
+      }
+      
+      console.log('Seeding database with initial data...');
+      
+      // Create admin user
+      const adminUser = await this.createUser({
+        username: 'admin',
+        email: 'admin@barbershop.com',
+        password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // "password123"
+        role: 'admin',
+        fullName: 'Admin User',
+        phone: '555-123-4567'
+      });
+
+      // Create barber users
+      const barber1 = await this.createUser({
+        username: 'john',
+        email: 'john@barbershop.com',
+        password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // "password123"
+        role: 'barber',
+        fullName: 'John Smith',
+        phone: '555-222-3333'
+      });
+      
+      const barber2 = await this.createUser({
+        username: 'sarah',
+        email: 'sarah@barbershop.com',
+        password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // "password123"
+        role: 'barber',
+        fullName: 'Sarah Johnson',
+        phone: '555-444-5555'
+      });
+      
+      // Create client user
+      const clientUser = await this.createUser({
+        username: 'client',
+        email: 'client@example.com',
+        password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // "password123"
+        role: 'client',
+        fullName: 'Test Client',
+        phone: '555-777-8888'
+      });
+      
+      // Create barber profiles
+      const johnBarber = await this.createBarber({
+        userId: barber1.id,
+        speciality: 'Classic cuts, Fade specialist',
+        bio: 'With over 10 years of experience, John specializes in classic men\'s cuts and fade techniques.',
+        image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a'
+      });
+      
+      const sarahBarber = await this.createBarber({
+        userId: barber2.id,
+        speciality: 'Modern styles, Women\'s cuts',
+        bio: 'Sarah is passionate about creating modern, personalized styles for all clients.',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'
+      });
+      
+      // Create services
+      await this.createService({
+        name: 'Men\'s Haircut',
+        type: 'haircut',
+        description: 'Classic men\'s haircut with styling',
+        price: 2500, // $25.00
+        duration: 30,
+        image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1'
+      });
+      
+      await this.createService({
+        name: 'Beard Trim',
+        type: 'beard',
+        description: 'Professional beard trimming and shaping',
+        price: 1500, // $15.00
+        duration: 20,
+        image: 'https://images.unsplash.com/photo-1523433825-22da8853c13d'
+      });
+      
+      await this.createService({
+        name: 'Haircut & Beard Combo',
+        type: 'combo',
+        description: 'Full haircut and beard trim package',
+        price: 3500, // $35.00
+        duration: 45,
+        image: 'https://images.unsplash.com/photo-1493256338651-d82f7acb2b38'
+      });
+      
+      await this.createService({
+        name: 'Women\'s Haircut',
+        type: 'womens-haircut',
+        description: 'Women\'s haircut and styling',
+        price: 4000, // $40.00
+        duration: 45,
+        image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df'
+      });
+      
+      await this.createService({
+        name: 'Women\'s Styling',
+        type: 'womens-styling',
+        description: 'Professional styling for any occasion',
+        price: 3000, // $30.00
+        duration: 30,
+        image: 'https://images.unsplash.com/photo-1560343776-97e7d202ff0e'
+      });
+      
+      await this.createService({
+        name: 'Women\'s Color',
+        type: 'womens-color',
+        description: 'Professional hair coloring service',
+        price: 7500, // $75.00
+        duration: 120,
+        image: 'https://images.unsplash.com/photo-1519356162478-a1526020abe1'
+      });
+      
+      console.log('Database seeded successfully');
+    } catch (error) {
+      console.error('Error seeding database:', error);
+      throw error;
+    }
+  }
 }
 
 // Use PostgreSQL database
-export const storage = initializeStorage(true);
+export const storage = new DatabaseStorage();
+
+// Initialize the database with seed data
+(async () => {
+  try {
+    await storage.seedData();
+  } catch (error) {
+    console.error('Failed to seed database:', error);
+  }
+})();

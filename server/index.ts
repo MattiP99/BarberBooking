@@ -2,8 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testConnection, initializeDatabase } from "./db";
-import { PgStorage } from "./pgStorage";
-import { initializeStorage } from "./storage";
+import { storage } from "./storage";
 import { config } from 'dotenv';
 
 const app = express();
@@ -52,10 +51,7 @@ app.use((req, res, next) => {
       // Initialize database schema
       await initializeDatabase();
       
-      // Create and seed the PostgreSQL storage
-      const pgStorage = new PgStorage();
-      await pgStorage.seedData();
-      
+      // Database is ready to use with our DatabaseStorage implementation
       log('Database initialized successfully');
     } else {
       log('Failed to connect to database, falling back to in-memory storage', 'warning');
