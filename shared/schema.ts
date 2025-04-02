@@ -6,7 +6,7 @@ import { z } from "zod";
 export const userRoleEnum = pgEnum('user_role', ['client', 'barber', 'admin']);
 
 // Services enumeration
-export const serviceTypeEnum = pgEnum('service_type', ['haircut', 'beard', 'combo']);
+export const serviceTypeEnum = pgEnum('service_type', ['haircut', 'beard', 'combo', 'womens-haircut', 'womens-styling', 'womens-color']);
 
 // Appointment status enumeration
 export const appointmentStatusEnum = pgEnum('appointment_status', [

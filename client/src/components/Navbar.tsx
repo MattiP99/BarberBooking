@@ -46,6 +46,11 @@ const Navbar = () => {
                   Home
                 </a>
               </Link>
+              <Link href="/about-us">
+                <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                  About Us
+                </a>
+              </Link>
               <Link href="/booking">
                 <a className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
                   Book Now
@@ -140,6 +145,11 @@ const Navbar = () => {
           <Link href="/">
             <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
               Home
+            </a>
+          </Link>
+          <Link href="/about-us">
+            <a className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+              About Us
             </a>
           </Link>
           <Link href="/booking">

@@ -10,6 +10,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Booking from "@/pages/Booking";
 import Dashboard from "@/pages/Dashboard";
+import AboutUs from "@/pages/AboutUs";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -25,6 +26,7 @@ function Router() {
           <Route path="/register" component={Register} />
           <Route path="/booking" component={Booking} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/about-us" component={AboutUs} />
           <Route component={NotFound} />
         </Switch>
       </main>

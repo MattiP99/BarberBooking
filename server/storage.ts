@@ -75,9 +75,15 @@ export class MemStorage implements IStorage {
   private seedData() {
     // Add default services
     const services: InsertService[] = [
-      { name: 'Classic Haircut', type: 'haircut', description: 'Traditional haircut with precision styling and hot towel finish.', price: 2500, duration: 30, image: 'https://images.unsplash.com/photo-1593702288056-f5924ad2c80c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
+      // Men's services
+      { name: 'Classic Haircut', type: 'haircut', description: 'Traditional haircut with precision styling and hot towel finish.', price: 2500, duration: 30, image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
       { name: 'Beard Trim', type: 'beard', description: 'Expert beard shaping and styling with essential oils treatment.', price: 1500, duration: 20, image: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
-      { name: 'Premium Package', type: 'combo', description: 'Complete grooming experience with haircut, beard trim, and facial.', price: 4500, duration: 60, image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' }
+      { name: 'Premium Package', type: 'combo', description: 'Complete grooming experience with haircut, beard trim, and facial.', price: 4500, duration: 60, image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
+      
+      // Women's services
+      { name: 'Women\'s Haircut', type: 'womens-haircut', description: 'Professional women\'s haircut tailored to your face shape and personal style.', price: 3500, duration: 45, image: 'https://images.unsplash.com/photo-1560869713-7d0a29430803?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
+      { name: 'Blow Dry & Styling', type: 'womens-styling', description: 'Expert blow dry and styling to achieve your desired look for any occasion.', price: 2800, duration: 40, image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' },
+      { name: 'Hair Coloring', type: 'womens-color', description: 'Professional coloring service using premium products to achieve vibrant, long-lasting results.', price: 6500, duration: 90, image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=400&q=80' }
     ];
     
     services.forEach(service => this.createService(service));
