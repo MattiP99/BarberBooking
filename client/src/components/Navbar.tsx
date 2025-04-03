@@ -12,13 +12,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/lib/language";
 
 
 const Navbar = () => {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('en'); // Add language state
+  const { language, setLanguage } = useLanguage();
 
   // Close mobile menu when location changes
   useEffect(() => {
@@ -134,7 +135,7 @@ const Navbar = () => {
             </button>
           </div>
           <Select onValueChange={setLanguage} value={language}>
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className="w-[70px] bg-transparent text-white border-white">
               <SelectValue placeholder="EN" />
             </SelectTrigger>
             <SelectContent>
