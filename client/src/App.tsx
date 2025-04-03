@@ -11,6 +11,8 @@ import Register from "@/pages/Register";
 import Booking from "@/pages/Booking";
 import Dashboard from "@/pages/Dashboard";
 import AboutUs from "@/pages/AboutUs";
+import MensServices from "@/pages/MensServices";
+import WomensServices from "@/pages/WomensServices";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -27,6 +29,8 @@ function Router() {
           <Route path="/booking" component={Booking} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/about-us" component={AboutUs} />
+          <Route path="/mens-services" component={MensServices} />
+          <Route path="/womens-services" component={WomensServices} />
           <Route component={NotFound} />
         </Switch>
       </main>

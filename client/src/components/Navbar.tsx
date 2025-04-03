@@ -44,6 +44,12 @@ const Navbar = () => {
               <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
                 Home
               </Link>
+              <Link href="/mens-services" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/mens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                Men's Services
+              </Link>
+              <Link href="/womens-services" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/womens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+                Women's Services
+              </Link>
               <Link href="/about-us" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
                 About Us
               </Link>
@@ -132,6 +138,12 @@ const Navbar = () => {
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link href="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
             Home
+          </Link>
+          <Link href="/mens-services" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/mens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+            Men's Services
+          </Link>
+          <Link href="/womens-services" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/womens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
+            Women's Services
           </Link>
           <Link href="/about-us" className={`block px-3 py-2 rounded-md text-base font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
             About Us
