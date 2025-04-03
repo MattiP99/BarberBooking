@@ -746,19 +746,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // A real booked slot (with an appointment) shouldn't be deletable
       // Check if there's an appointment with this timeSlot's start time
-      const appointments = await storage.getAppointments();
+      // Get appointments ONLY for this barber
+      const appointments = await storage.getAppointmentsByBarber(timeSlot.barberId);
+      
+      // Add detailed logging for debugging
+      console.log(`Checking if timeslot ${timeSlotId} can be deleted`);
+      console.log(`Timeslot start time: ${timeSlot.startTime}`);
+      
       const hasAppointment = appointments.some(appointment => {
         const appointmentDate = new Date(appointment.date);
         const timeSlotStartTime = new Date(timeSlot.startTime);
         
-        // If appointment date is the same as this time slot's start time
-        return (
+        // Only compare appointments for the exact same time
+        const isSameTime = (
           appointmentDate.getFullYear() === timeSlotStartTime.getFullYear() &&
           appointmentDate.getMonth() === timeSlotStartTime.getMonth() &&
           appointmentDate.getDate() === timeSlotStartTime.getDate() &&
           appointmentDate.getHours() === timeSlotStartTime.getHours() &&
-          appointmentDate.getMinutes() === timeSlotStartTime.getMinutes()
+          appointmentDate.getMinutes() === timeSlotStartTime.getMinutes() &&
+          appointment.barberId === timeSlot.barberId  // Ensure same barber
         );
+        
+        if (isSameTime) {
+          console.log(`Found conflicting appointment: ${appointment.id} at ${appointmentDate}`);
+        }
+        
+        return isSameTime;
       });
       
       if (hasAppointment) {

@@ -160,8 +160,21 @@ const BarberCalendarView = ({
         title: "Time slot unblocked",
         description: "The time slot has been successfully unblocked",
       });
-      // Refetch time slots data
-      queryClient.invalidateQueries({ queryKey: [`/api/time-slots`] });
+      
+      // Use the same query key format as in EnhancedBarberDashboard to ensure proper invalidation
+      const barberId = timeSlots.length > 0 ? timeSlots[0].barberId : null;
+      if (barberId) {
+        queryClient.invalidateQueries({ 
+          queryKey: [
+            '/api/time-slots', 
+            barberId, 
+            selectedDate.toISOString().split('T')[0]
+          ] 
+        });
+      } else {
+        // Fallback to invalidating all time slots if no barberId found
+        queryClient.invalidateQueries({ queryKey: ['/api/time-slots'] });
+      }
     },
     onError: (error: Error) => {
       toast({
