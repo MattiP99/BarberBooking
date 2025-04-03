@@ -172,7 +172,7 @@ export class PgStorage implements IStorage {
     const adminUser = await this.createUser({
       username: 'admin',
       email: 'admin@barbeshop.com',
-      password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
+      password: '$2b$10$QadQFjSmLJ3wV/utmJ7cBuqWbTOdfxz6ePZEA.bBXsIBx1s3BflN2', // password: admin123
       role: 'admin',
       fullName: 'Admin User',
       phone: '+1234567890'
@@ -182,7 +182,7 @@ export class PgStorage implements IStorage {
     const marcoUser = await this.createUser({
       username: 'marco',
       email: 'marco@barbeshop.com',
-      password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
+      password: '$2b$10$QadQFjSmLJ3wV/utmJ7cBuqWbTOdfxz6ePZEA.bBXsIBx1s3BflN2', // password: admin123
       role: 'barber',
       fullName: 'Marco Rossi',
       phone: '+1234567891'
@@ -198,7 +198,7 @@ export class PgStorage implements IStorage {
     const lucaUser = await this.createUser({
       username: 'luca',
       email: 'luca@barbeshop.com',
-      password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
+      password: '$2b$10$QadQFjSmLJ3wV/utmJ7cBuqWbTOdfxz6ePZEA.bBXsIBx1s3BflN2', // password: admin123
       role: 'barber',
       fullName: 'Luca Bianchi',
       phone: '+1234567892'
@@ -215,7 +215,7 @@ export class PgStorage implements IStorage {
     await this.createUser({
       username: 'customer',
       email: 'customer@example.com',
-      password: '$2b$10$aDJN8XQpXrHLNkOI2EJ.puQcj9z6WoU1E/gLh37RXu5MSKoiPwfY2', // password: admin123
+      password: '$2b$10$QadQFjSmLJ3wV/utmJ7cBuqWbTOdfxz6ePZEA.bBXsIBx1s3BflN2', // password: admin123
       role: 'client',
       fullName: 'John Doe',
       phone: '+1234567893'
