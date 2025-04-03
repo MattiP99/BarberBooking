@@ -152,7 +152,7 @@ const Home = () => {
                 Error loading services: {servicesQuery.error.message}
               </div>
             ) : (
-              servicesQuery.data.slice(0, 3).map((service: Service) => (
+              (servicesQuery.data as Service[]).slice(0, 3).map((service: Service) => (
                 <ServiceCard key={service.id} service={service} />
               ))
             )}
@@ -203,7 +203,7 @@ const Home = () => {
                 Error loading barbers: {barbersQuery.error.message}
               </div>
             ) : (
-              barbersQuery.data.map((barber: Barber) => (
+              (barbersQuery.data as Barber[]).map((barber: Barber) => (
                 <BarberCard key={barber.id} barber={barber} />
               ))
             )}

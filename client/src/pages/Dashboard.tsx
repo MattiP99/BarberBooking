@@ -1,6 +1,6 @@
 import { useAuth } from "@/lib/auth";
 import { Redirect } from "wouter";
-import BarberDashboard from "@/components/BarberDashboard";
+import EnhancedBarberDashboard from "@/components/EnhancedBarberDashboard";
 
 const Dashboard = () => {
   const { user, isLoading } = useAuth();
@@ -19,7 +19,7 @@ const Dashboard = () => {
     return <Redirect to="/" />;
   }
   
-  return <BarberDashboard />;
+  return <EnhancedBarberDashboard />;
 };
 
 export default Dashboard;

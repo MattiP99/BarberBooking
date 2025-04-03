@@ -566,6 +566,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Time slots endpoints
+  apiRouter.get("/time-slots", authenticate, async (req, res) => {
+    try {
+      const barberId = req.query.barberId ? parseInt(req.query.barberId as string) : undefined;
+      const dateStr = req.query.date as string | undefined;
+      
+      if (!barberId) {
+        return res.status(400).json({ message: "Barber ID is required" });
+      }
+      
+      let date: Date;
+      if (dateStr) {
+        date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          return res.status(400).json({ message: "Invalid date format" });
+        }
+      } else {
+        date = new Date();
+      }
+      
+      const timeSlots = await storage.getTimeSlots(barberId, date);
+      res.status(200).json(timeSlots);
+    } catch (error) {
+      console.error("Get time slots error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  apiRouter.get("/time-slots/:id", authenticate, async (req, res) => {
+    try {
+      const timeSlotId = parseInt(req.params.id);
+      if (isNaN(timeSlotId)) {
+        return res.status(400).json({ message: "Invalid time slot ID" });
+      }
+      
+      const timeSlot = await storage.getTimeSlot(timeSlotId);
+      if (!timeSlot) {
+        return res.status(404).json({ message: "Time slot not found" });
+      }
+      
+      res.status(200).json(timeSlot);
+    } catch (error) {
+      console.error("Get time slot error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  apiRouter.post("/time-slots", authenticate, async (req, res) => {
+    try {
+      // Validate that only barbers and admins can create time slots
+      if (req.user!.role !== 'barber' && req.user!.role !== 'admin') {
+        return res.status(403).json({ message: "Only barbers and admins can create time slots" });
+      }
+      
+      const { barberId, startTime, endTime, isBooked } = req.body;
+      
+      if (!barberId || !startTime || !endTime) {
+        return res.status(400).json({ message: "Barber ID, start time, and end time are required" });
+      }
+      
+      // If the user is a barber, validate they can only create time slots for themselves
+      if (req.user!.role === 'barber') {
+        const barber = await storage.getBarberByUserId(req.user!.id);
+        if (!barber || barber.id !== barberId) {
+          return res.status(403).json({ message: "Barbers can only create time slots for themselves" });
+        }
+      }
+      
+      // Create the time slot
+      const newTimeSlot = await storage.createTimeSlot({
+        barberId,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        isBooked: isBooked || false
+      });
+      
+      res.status(201).json(newTimeSlot);
+    } catch (error) {
+      console.error("Create time slot error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  apiRouter.patch("/time-slots/:id", authenticate, async (req, res) => {
+    try {
+      const timeSlotId = parseInt(req.params.id);
+      if (isNaN(timeSlotId)) {
+        return res.status(400).json({ message: "Invalid time slot ID" });
+      }
+      
+      // Get the time slot
+      const timeSlot = await storage.getTimeSlot(timeSlotId);
+      if (!timeSlot) {
+        return res.status(404).json({ message: "Time slot not found" });
+      }
+      
+      // Validate that only barbers and admins can update time slots
+      if (req.user!.role !== 'barber' && req.user!.role !== 'admin') {
+        return res.status(403).json({ message: "Only barbers and admins can update time slots" });
+      }
+      
+      // If the user is a barber, validate they can only update their own time slots
+      if (req.user!.role === 'barber') {
+        const barber = await storage.getBarberByUserId(req.user!.id);
+        if (!barber || barber.id !== timeSlot.barberId) {
+          return res.status(403).json({ message: "Barbers can only update their own time slots" });
+        }
+      }
+      
+      const { startTime, endTime, isBooked } = req.body;
+      
+      // Update the time slot
+      const updatedTimeSlot = await storage.updateTimeSlot(timeSlotId, {
+        startTime: startTime ? new Date(startTime) : undefined,
+        endTime: endTime ? new Date(endTime) : undefined,
+        isBooked: isBooked !== undefined ? isBooked : undefined
+      });
+      
+      if (!updatedTimeSlot) {
+        return res.status(500).json({ message: "Failed to update time slot" });
+      }
+      
+      res.status(200).json(updatedTimeSlot);
+    } catch (error) {
+      console.error("Update time slot error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Endpoint to get a barber by user ID
+  apiRouter.get("/barbers/by-user/:userId", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const barber = await storage.getBarberByUserId(userId);
+      if (!barber) {
+        return res.status(404).json({ message: "Barber not found" });
+      }
+      
+      res.status(200).json(barber);
+    } catch (error) {
+      console.error("Get barber by user ID error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
