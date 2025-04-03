@@ -54,9 +54,10 @@ const BarberCalendarView = ({
   const [blockStartTime, setBlockStartTime] = useState<Date | null>(null);
   const [blockEndTime, setBlockEndTime] = useState<Date | null>(null);
 
-  // Business hours (9am to 6pm by default)
+  // Business hours (9am to 7:30pm)
   const startHour = 9;
-  const endHour = 18; // 6pm
+  const endHour = 19; // 7:30pm
+  const endMinute = 30; // End at 7:30pm
   const intervalMinutes = 30; // 30-minute intervals
 
   // Define the type for our time slot rows
@@ -71,8 +72,10 @@ const BarberCalendarView = ({
 
   // Generate time slots for the selected day
   const timeSlotRows: TimeSlotRow[] = [];
-  for (let hour = startHour; hour < endHour; hour++) {
+  for (let hour = startHour; hour <= endHour; hour++) {
     for (let minute = 0; minute < 60; minute += intervalMinutes) {
+      // Skip slots after endMinute if we're at the last hour
+      if (hour === endHour && minute > endMinute) continue;
       const slotTime = new Date(selectedDate);
       slotTime.setHours(hour, minute, 0, 0);
       

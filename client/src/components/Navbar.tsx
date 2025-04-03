@@ -11,11 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 const Navbar = () => {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [language, setLanguage] = useState('en'); // Add language state
 
   // Close mobile menu when location changes
   useEffect(() => {
@@ -25,7 +28,7 @@ const Navbar = () => {
   // Get user initials for avatar
   const getUserInitials = () => {
     if (!user || !user.fullName) return "U";
-    
+
     const names = user.fullName.split(" ");
     if (names.length === 1) return names[0].charAt(0).toUpperCase();
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
@@ -104,8 +107,8 @@ const Navbar = () => {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      className="text-red-600 cursor-pointer" 
+                    <DropdownMenuItem
+                      className="text-red-600 cursor-pointer"
                       onClick={logout}
                     >
                       Log out
@@ -130,6 +133,15 @@ const Navbar = () => {
               )}
             </button>
           </div>
+          <Select onValueChange={setLanguage} value={language}>
+            <SelectTrigger className="w-[70px]">
+              <SelectValue placeholder="EN" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">EN</SelectItem>
+              <SelectItem value="it">IT</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -157,7 +169,7 @@ const Navbar = () => {
             </Link>
           )}
         </div>
-        
+
         {user && (
           <div className="pt-4 pb-3 border-t border-primary-light">
             <div className="flex items-center px-5">
