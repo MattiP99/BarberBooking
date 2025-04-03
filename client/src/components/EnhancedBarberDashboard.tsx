@@ -24,24 +24,25 @@ const EnhancedBarberDashboard = () => {
     queryKey: ['/api/appointments'],
   });
   
-  // Query for fetching time slots
-  const timeSlotsQuery = useQuery({
-    queryKey: ['/api/time-slots', user?.id, selectedDate.toISOString().split('T')[0]],
+  // Get barber for the current user
+  const barberQuery = useQuery({
+    queryKey: ['/api/barbers/by-user', user?.id],
     queryFn: async () => {
-      if (!user) return [];
-      
-      // Get barber ID from user ID
-      const barberRes = await apiRequest('GET', `/api/barbers/by-user/${user.id}`);
-      const barber = await barberRes.json();
-      
-      if (!barber) return [];
-      
-      // Get time slots for this barber and date
-      const datePart = selectedDate.toISOString().split('T')[0];
-      const res = await apiRequest('GET', `/api/time-slots?barberId=${barber.id}&date=${datePart}`);
+      if (!user) return null;
+      const res = await apiRequest('GET', `/api/barbers/by-user/${user.id}`);
       return res.json();
     },
     enabled: !!user
+  });
+  
+  // Query for fetching time slots
+  const timeSlotsQuery = useQuery({
+    queryKey: [
+      '/api/time-slots', 
+      'barberId', barberQuery.data?.id, 
+      'date', selectedDate.toISOString().split('T')[0]
+    ],
+    enabled: !!user && !!barberQuery.data?.id
   });
   
   // Mutation for blocking time slots
@@ -49,15 +50,11 @@ const EnhancedBarberDashboard = () => {
     mutationFn: async ({ startTime, endTime }: { startTime: Date, endTime: Date }) => {
       if (!user) throw new Error("User not authenticated");
       
-      // Get barber ID from user ID
-      const barberRes = await apiRequest('GET', `/api/barbers/by-user/${user.id}`);
-      const barber = await barberRes.json();
-      
-      if (!barber) throw new Error("Barber profile not found");
+      if (!barberQuery.data) throw new Error("Barber profile not found");
       
       // Create a new time slot
       const res = await apiRequest('POST', '/api/time-slots', {
-        barberId: barber.id,
+        barberId: barberQuery.data.id,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
         isBooked: true

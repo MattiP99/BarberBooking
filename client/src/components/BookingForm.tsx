@@ -42,7 +42,11 @@ const BookingForm = () => {
 
   // Query for time slots
   const timeSlotsQuery = useQuery<TimeSlot[]>({
-    queryKey: ['/api/time-slots', bookingData.barber?.id, selectedDate?.toISOString().split('T')[0]],
+    queryKey: [
+      '/api/time-slots', 
+      'barberId', bookingData.barber?.id, 
+      'date', selectedDate?.toISOString().split('T')[0]
+    ],
     enabled: !!bookingData.barber && !!selectedDate,
   });
 
