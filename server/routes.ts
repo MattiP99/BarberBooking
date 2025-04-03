@@ -399,9 +399,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate the transformed request body
       const appointmentData = insertAppointmentSchema.parse(rawData);
       
-      // Clients can only book appointments for themselves
+      // Validate permissions based on role
       if (req.user!.role === 'client' && appointmentData.userId !== req.user!.id) {
         return res.status(403).json({ message: "You can only book appointments for yourself" });
+      } else if (req.user!.role === 'barber') {
+        // Barbers can create appointments but only for their own slots
+        const barber = await storage.getBarberByUserId(req.user!.id);
+        if (!barber || barber.id !== appointmentData.barberId) {
+          return res.status(403).json({ message: "You can only create appointments for your own slots" });
+        }
       }
       
       // Check if the service exists
