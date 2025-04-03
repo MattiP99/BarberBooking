@@ -85,14 +85,39 @@ export const insertBarberSchema = createInsertSchema(barbers).omit({
   id: true
 });
 
-export const insertAppointmentSchema = createInsertSchema(appointments).omit({
-  id: true,
-  createdAt: true
-});
+// Create schema and handle ISO string dates
+export const insertAppointmentSchema = createInsertSchema(appointments)
+  .omit({
+    id: true,
+    createdAt: true
+  })
+  .transform((data) => {
+    // If date is a string, convert to Date
+    if (typeof data.date === 'string') {
+      return {
+        ...data,
+        date: new Date(data.date)
+      };
+    }
+    return data;
+  });
 
-export const insertTimeSlotSchema = createInsertSchema(timeSlots).omit({
-  id: true
-});
+// Create time slots schema and handle ISO string dates
+export const insertTimeSlotSchema = createInsertSchema(timeSlots)
+  .omit({
+    id: true
+  })
+  .transform((data) => {
+    // Convert string dates to Date objects
+    const result = { ...data };
+    if (typeof data.startTime === 'string') {
+      result.startTime = new Date(data.startTime);
+    }
+    if (typeof data.endTime === 'string') {
+      result.endTime = new Date(data.endTime);
+    }
+    return result;
+  });
 
 // Create types from schemas
 export type InsertUser = z.infer<typeof insertUserSchema>;

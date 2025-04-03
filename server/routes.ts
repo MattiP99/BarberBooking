@@ -384,8 +384,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   apiRouter.post("/appointments", authenticate, async (req, res) => {
     try {
-      // Validate request body
-      const appointmentData = insertAppointmentSchema.parse(req.body);
+      // Parse request body and handle date conversion
+      // If the date is an ISO string, convert it to a Date object
+      const rawData = req.body;
+      
+      if (typeof rawData.date === "string") {
+        rawData.date = new Date(rawData.date);
+        if (isNaN(rawData.date.getTime())) {
+          return res.status(400).json({ message: "Invalid date format" });
+        }
+      }
+      
+      // Validate the transformed request body
+      const appointmentData = insertAppointmentSchema.parse(rawData);
       
       // Clients can only book appointments for themselves
       if (req.user!.role === 'client' && appointmentData.userId !== req.user!.id) {

@@ -56,7 +56,7 @@ const BookingForm = () => {
       userId: number;
       barberId: number;
       serviceId: number;
-      date: Date;
+      date: Date | string; // Allow both Date object and ISO string
       notes?: string;
     }) => {
       const res = await apiRequest('POST', '/api/appointments', appointmentData);
@@ -160,11 +160,12 @@ const BookingForm = () => {
     const [hours, minutes] = bookingData.time.split(':').map(Number);
     appointmentDate.setHours(hours, minutes, 0, 0);
     
+    // Convert date to ISO string format which Zod can properly parse as timestamp
     createAppointmentMutation.mutate({
       userId: user.id,
       barberId: bookingData.barber.id,
       serviceId: bookingData.service.id,
-      date: appointmentDate,
+      date: appointmentDate.toISOString(), // Convert to ISO string for proper handling
       notes: bookingData.notes
     });
   };
