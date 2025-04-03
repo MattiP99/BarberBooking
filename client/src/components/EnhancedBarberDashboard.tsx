@@ -21,12 +21,21 @@ const EnhancedBarberDashboard = () => {
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isAddAppointmentOpen, setIsAddAppointmentOpen] = useState(false);
-  
+
+  const handleAddAppointment = () => {
+    setIsAddAppointmentOpen(true);
+  };
+
+  const handleCloseAppointment = () => {
+    setIsAddAppointmentOpen(false);
+  };
+
+
   // Query for fetching appointments
   const appointmentsQuery = useQuery({
     queryKey: ['/api/appointments'],
   });
-  
+
   // Get barber for the current user
   const barberQuery = useQuery({
     queryKey: ['/api/barbers/by-user', user?.id],
@@ -37,7 +46,7 @@ const EnhancedBarberDashboard = () => {
     },
     enabled: !!user
   });
-  
+
   // Query for fetching time slots
   const timeSlotsQuery = useQuery({
     queryKey: [
@@ -47,7 +56,7 @@ const EnhancedBarberDashboard = () => {
     ],
     queryFn: async () => {
       if (!barberQuery.data?.id) return [];
-      
+
       const res = await apiRequest(
         'GET', 
         `/api/time-slots?barberId=${barberQuery.data.id}&date=${encodeURIComponent(selectedDate.toISOString().split('T')[0])}` 
@@ -56,14 +65,14 @@ const EnhancedBarberDashboard = () => {
     },
     enabled: !!user && !!barberQuery.data?.id
   });
-  
+
   // Mutation for blocking time slots
   const blockTimeMutation = useMutation({
     mutationFn: async ({ startTime, endTime }: { startTime: Date, endTime: Date }) => {
       if (!user) throw new Error("User not authenticated");
-      
+
       if (!barberQuery.data) throw new Error("Barber profile not found");
-      
+
       // Create a new time slot
       const res = await apiRequest('POST', '/api/time-slots', {
         barberId: barberQuery.data.id,
@@ -71,7 +80,7 @@ const EnhancedBarberDashboard = () => {
         endTime: endTime.toISOString(),
         isBooked: true
       });
-      
+
       return res.json();
     },
     onSuccess: () => {
@@ -83,7 +92,7 @@ const EnhancedBarberDashboard = () => {
           selectedDate.toISOString().split('T')[0]
         ] 
       });
-      
+
       toast({
         title: "Success",
         description: "Time slot blocked successfully",
@@ -97,7 +106,7 @@ const EnhancedBarberDashboard = () => {
       });
     }
   });
-  
+
   const handleBlockTime = (startTime: Date, endTime: Date) => {
     blockTimeMutation.mutate({ startTime, endTime });
   };
@@ -111,7 +120,7 @@ const EnhancedBarberDashboard = () => {
         </div>
         <div className="mt-4 md:mt-0">
           <Button 
-            onClick={() => setIsAddAppointmentOpen(true)}
+            onClick={handleAddAppointment}
             className="flex items-center gap-2"
           >
             <PlusCircle className="h-5 w-5" />
@@ -119,13 +128,13 @@ const EnhancedBarberDashboard = () => {
           </Button>
         </div>
       </div>
-      
+
       {/* Add Appointment Form Dialog */}
       <AddAppointmentForm 
         isOpen={isAddAppointmentOpen} 
-        onClose={() => setIsAddAppointmentOpen(false)} 
+        onClose={handleCloseAppointment} 
       />
-      
+
       <Tabs defaultValue="appointments" className="space-y-6">
         <div className="border-b">
           <TabsList className="w-full justify-start h-12">
@@ -140,11 +149,11 @@ const EnhancedBarberDashboard = () => {
             </TabsTrigger>
           </TabsList>
         </div>
-        
+
         <TabsContent value="appointments" className="space-y-6">
           <BarberDashboard />
         </TabsContent>
-        
+
         <TabsContent value="schedule" className="space-y-6">
           <BarberCalendarView
             selectedDate={selectedDate}
@@ -156,11 +165,11 @@ const EnhancedBarberDashboard = () => {
             onBlockTime={handleBlockTime}
           />
         </TabsContent>
-        
+
         <TabsContent value="pending" className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <PendingAppointments />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Quick Tips</CardTitle>
@@ -175,14 +184,14 @@ const EnhancedBarberDashboard = () => {
                     Try to respond to pending appointments within 24 hours to provide the best customer experience.
                   </p>
                 </div>
-                
+
                 <div>
                   <h3 className="font-medium mb-1">Blocking Time Off</h3>
                   <p className="text-sm text-gray-500">
                     Remember to block off time for breaks, meetings, or personal appointments in the Schedule tab.
                   </p>
                 </div>
-                
+
                 <div>
                   <h3 className="font-medium mb-1">Preparing for Appointments</h3>
                   <p className="text-sm text-gray-500">
