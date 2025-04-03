@@ -232,7 +232,7 @@ const AddAppointmentForm = ({ isOpen, onClose }: AddAppointmentFormProps) => {
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md md:max-w-xl">
+      <DialogContent className="max-w-md md:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Appointment</DialogTitle>
           <DialogDescription>

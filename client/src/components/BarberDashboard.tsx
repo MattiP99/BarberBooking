@@ -227,26 +227,7 @@ const BarberDashboard = () => {
           <p className="mt-2 text-lg text-gray-600">Manage your appointments and schedule</p>
         </div>
         <div className="mt-4 flex md:mt-0">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="ml-3 bg-amber-600 hover:bg-amber-700">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Appointment
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Appointment</DialogTitle>
-                <DialogDescription>
-                  This feature will be implemented in a future update.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline">Cancel</Button>
-                <Button>Add Appointment</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          
         </div>
       </div>
 
