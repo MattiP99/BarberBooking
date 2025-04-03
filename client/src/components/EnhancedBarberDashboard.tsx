@@ -39,9 +39,18 @@ const EnhancedBarberDashboard = () => {
   const timeSlotsQuery = useQuery({
     queryKey: [
       '/api/time-slots', 
-      'barberId', barberQuery.data?.id, 
-      'date', selectedDate.toISOString().split('T')[0]
+      barberQuery.data?.id, 
+      selectedDate.toISOString().split('T')[0]
     ],
+    queryFn: async () => {
+      if (!barberQuery.data?.id) return [];
+      
+      const res = await apiRequest(
+        'GET', 
+        `/api/time-slots?barberId=${barberQuery.data.id}&date=${encodeURIComponent(selectedDate.toISOString().split('T')[0])}` 
+      );
+      return res.json();
+    },
     enabled: !!user && !!barberQuery.data?.id
   });
   
@@ -63,7 +72,14 @@ const EnhancedBarberDashboard = () => {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/time-slots'] });
+      // Invalidate with the specific query keys to refresh the time slots
+      queryClient.invalidateQueries({ 
+        queryKey: [
+          '/api/time-slots', 
+          barberQuery.data?.id, 
+          selectedDate.toISOString().split('T')[0]
+        ] 
+      });
       
       toast({
         title: "Success",

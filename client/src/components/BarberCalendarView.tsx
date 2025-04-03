@@ -82,11 +82,15 @@ const BarberCalendarView = ({
       
       // Check if this time slot is blocked
       const isBlocked = timeSlots.some(slot => {
+        if (!slot.isBooked) return false; // Only manual blocks count as "blocked"
+        
         const slotStartTime = new Date(slot.startTime);
         const slotEndTime = new Date(slot.endTime);
+        
+        // Check if this time slot falls within a blocked range
         return (
-          (slotStartTime <= slotTime && slotEndTime > slotTime) ||
-          (slotStartTime < slotEndTime && slotEndTime >= slotEndTime)
+          (slotStartTime <= slotTime && slotEndTime > slotTime) || // Time slot starts during the block
+          (slotTime <= slotStartTime && slotEndTime <= slotEndTime) // Block contains the time slot
         );
       });
       
@@ -169,7 +173,7 @@ const BarberCalendarView = ({
             <CardTitle>
               {isToday(selectedDate) ? "Today" : formatDate(selectedDate)}
             </CardTitle>
-            <Dialog>
+            <Dialog open={blockTimeDialogOpen} onOpenChange={setBlockTimeDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">Block Off Time</Button>
               </DialogTrigger>
@@ -199,12 +203,13 @@ const BarberCalendarView = ({
                             const time = new Date(e.target.value);
                             setBlockStartTime(time);
                             // Ensure end time is at least 30 mins after start time
-                            if (blockEndTime && blockEndTime <= time) {
+                            if (!blockEndTime || blockEndTime <= time) {
                               setBlockEndTime(addMinutes(time, 30));
                             }
                           }
                         }}
                       >
+                        <option value="">Select a start time</option>
                         {timeSlotRows
                           .filter(slot => !slot.isBooked && !slot.isBlocked)
                           .map((slot, i) => (
@@ -225,7 +230,9 @@ const BarberCalendarView = ({
                             setBlockEndTime(new Date(e.target.value));
                           }
                         }}
+                        disabled={!blockStartTime}
                       >
+                        <option value="">Select an end time</option>
                         {timeSlotRows
                           .filter(slot => 
                             blockStartTime && 
@@ -246,7 +253,10 @@ const BarberCalendarView = ({
                   <Button variant="outline" onClick={() => setBlockTimeDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleBlockTimeSubmit}>
+                  <Button 
+                    onClick={handleBlockTimeSubmit}
+                    disabled={!blockStartTime || !blockEndTime}
+                  >
                     Block Time
                   </Button>
                 </DialogFooter>
