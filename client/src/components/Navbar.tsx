@@ -46,19 +46,19 @@ const Navbar = () => {
             </div>
             <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
               <Link href="/" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                Home
+                {t('home')}
               </Link>
               <Link href="/mens-services" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/mens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                Men's Services
+                {t('mensServices')}
               </Link>
               <Link href="/womens-services" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/womens-services" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                Women's Services
+                {t('womensServices')}
               </Link>
               <Link href="/about-us" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/about-us" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                About Us
+                {t('about')}
               </Link>
               <Link href="/booking" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/booking" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>
-                Book Now
+                {t('booking')}
               </Link>
               {user && user.role !== 'client' && (
                 <Link href="/dashboard" className={`px-3 py-2 rounded-md text-sm font-medium ${location === "/dashboard" ? "text-white bg-primary-light" : "text-neutral-dark hover:text-white hover:bg-primary-light"}`}>

@@ -11,6 +11,7 @@ export const translations = {
     login: 'Login',
     register: 'Register',
     logout: 'Logout',
+    about: 'About Us',
     
     // Services
     mensServices: "Men's Services",
@@ -50,6 +51,7 @@ export const translations = {
     login: 'Accedi',
     register: 'Registrati',
     logout: 'Esci',
+    about: 'Chi Siamo',
     
     // Services
     mensServices: 'Servizi Uomo',
