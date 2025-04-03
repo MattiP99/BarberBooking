@@ -62,7 +62,7 @@ const BarberDashboard = () => {
   const [filters, setFilters] = useState({
     date: null as Date | null,
     client: '',
-    status: '' as AppointmentStatus | '',
+    status: 'all' as AppointmentStatus | 'all',
   });
   
   // State for pagination
@@ -153,7 +153,7 @@ const BarberDashboard = () => {
         }
         
         // Apply status filter
-        if (filters.status && appointment.status !== filters.status) {
+        if (filters.status && filters.status !== 'all' && appointment.status !== filters.status) {
           return false;
         }
         
@@ -206,7 +206,7 @@ const BarberDashboard = () => {
     setFilters({
       date: null,
       client: '',
-      status: '',
+      status: 'all',
     });
   };
   
@@ -296,13 +296,13 @@ const BarberDashboard = () => {
               <div>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, status: value as AppointmentStatus | '' }))}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, status: value as AppointmentStatus | 'all' }))}
                 >
                   <SelectTrigger className="w-full sm:w-auto">
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="confirmed">Confirmed</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
