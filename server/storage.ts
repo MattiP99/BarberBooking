@@ -8,6 +8,7 @@ import {
 
 export interface IStorage {
   // User operations
+  getUsers(): Promise<User[]>;
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -150,6 +151,10 @@ export class MemStorage implements IStorage {
   }
 
   // User operations
+  async getUsers(): Promise<User[]> {
+    return Array.from(this._users.values());
+  }
+  
   async getUser(id: number): Promise<User | undefined> {
     return this._users.get(id);
   }
@@ -344,6 +349,10 @@ import { eq, sql } from "drizzle-orm";
 // DatabaseStorage implementation for PostgreSQL
 export class DatabaseStorage implements IStorage {
   // User operations
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+  
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;

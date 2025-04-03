@@ -8,8 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BarberCalendarView from "@/components/BarberCalendarView";
 import PendingAppointments from "@/components/PendingAppointments";
+import AddAppointmentForm from "@/components/AddAppointmentForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlusCircle } from "lucide-react";
 
 // Import original BarberDashboard for the appointments table view
 import BarberDashboard from "@/components/BarberDashboard";
@@ -18,6 +20,7 @@ const EnhancedBarberDashboard = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isAddAppointmentOpen, setIsAddAppointmentOpen] = useState(false);
   
   // Query for fetching appointments
   const appointmentsQuery = useQuery({
@@ -106,7 +109,22 @@ const EnhancedBarberDashboard = () => {
           <h1 className="text-3xl font-extrabold text-primary">Barber Dashboard</h1>
           <p className="mt-2 text-lg text-gray-600">Manage your appointments and schedule</p>
         </div>
+        <div className="mt-4 md:mt-0">
+          <Button 
+            onClick={() => setIsAddAppointmentOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <PlusCircle className="h-5 w-5" />
+            Add Walk-in Appointment
+          </Button>
+        </div>
       </div>
+      
+      {/* Add Appointment Form Dialog */}
+      <AddAppointmentForm 
+        isOpen={isAddAppointmentOpen} 
+        onClose={() => setIsAddAppointmentOpen(false)} 
+      />
       
       <Tabs defaultValue="appointments" className="space-y-6">
         <div className="border-b">

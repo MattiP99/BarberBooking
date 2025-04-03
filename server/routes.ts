@@ -8,7 +8,8 @@ import {
   insertUserSchema,
   loginSchema,
   insertAppointmentSchema,
-  appointmentStatusEnum
+  appointmentStatusEnum,
+  User
 } from "@shared/schema";
 
 // Type augmentation for Request
@@ -807,6 +808,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(barber);
     } catch (error) {
       console.error("Get barber by user ID error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Endpoint to get users by role (for barbers to select clients)
+  apiRouter.get("/users", authenticate, async (req, res) => {
+    try {
+      // Only barbers and admins can access the list of users
+      if (req.user!.role !== 'barber' && req.user!.role !== 'admin') {
+        return res.status(403).json({ message: "Not authorized to view user list" });
+      }
+      
+      // Get users by role if specified
+      const role = req.query.role as string | undefined;
+      
+      const users = await storage.getUsers();
+      
+      // Filter users by role if specified
+      const filteredUsers = role 
+        ? users.filter((user: User) => user.role === role)
+        : users;
+      
+      // Remove passwords from response
+      const usersWithoutPasswords = filteredUsers.map((user: User) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.status(200).json(usersWithoutPasswords);
+    } catch (error) {
+      console.error("Get users error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Endpoint to create a new user (for walk-in clients)
+  apiRouter.post("/users", authenticate, async (req, res) => {
+    try {
+      // Only barbers and admins can create users
+      if (req.user!.role !== 'barber' && req.user!.role !== 'admin') {
+        return res.status(403).json({ message: "Not authorized to create users" });
+      }
+      
+      // Validate request body
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user with the same email already exists
+      if (userData.email) {
+        const existingUser = await storage.getUserByEmail(userData.email);
+        if (existingUser) {
+          return res.status(400).json({ message: "User with this email already exists" });
+        }
+      }
+      
+      // Check if username already exists
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
+      // Create user
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword
+      });
+      
+      // Return user without password
+      const { password, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      console.error("Create user error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
