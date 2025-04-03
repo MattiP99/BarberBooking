@@ -19,7 +19,7 @@ const Navbar = () => {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   // Close mobile menu when location changes
   useEffect(() => {
