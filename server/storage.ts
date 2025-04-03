@@ -39,6 +39,7 @@ export interface IStorage {
   getTimeSlot(id: number): Promise<TimeSlot | undefined>;
   createTimeSlot(timeSlot: InsertTimeSlot): Promise<TimeSlot>;
   updateTimeSlot(id: number, timeSlot: Partial<InsertTimeSlot>): Promise<TimeSlot | undefined>;
+  deleteTimeSlot(id: number): Promise<boolean>;
 }
 
 // In-memory storage implementation
@@ -331,6 +332,10 @@ export class MemStorage implements IStorage {
     this._timeSlots.set(id, updatedTimeSlot);
     return updatedTimeSlot;
   }
+  
+  async deleteTimeSlot(id: number): Promise<boolean> {
+    return this._timeSlots.delete(id);
+  }
 }
 
 import { db } from "./db";
@@ -479,6 +484,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(timeSlots.id, id))
       .returning();
     return updatedTimeSlot || undefined;
+  }
+  
+  async deleteTimeSlot(id: number): Promise<boolean> {
+    const [deletedTimeSlot] = await db
+      .delete(timeSlots)
+      .where(eq(timeSlots.id, id))
+      .returning();
+    return !!deletedTimeSlot;
   }
   
   // Method to seed initial data

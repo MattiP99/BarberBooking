@@ -711,6 +711,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete time slot endpoint
+  apiRouter.delete("/time-slots/:id", authenticate, async (req, res) => {
+    try {
+      const timeSlotId = parseInt(req.params.id);
+      if (isNaN(timeSlotId)) {
+        return res.status(400).json({ message: "Invalid time slot ID" });
+      }
+      
+      // Get the time slot
+      const timeSlot = await storage.getTimeSlot(timeSlotId);
+      if (!timeSlot) {
+        return res.status(404).json({ message: "Time slot not found" });
+      }
+      
+      // Validate that only barbers and admins can delete time slots
+      if (req.user!.role !== 'barber' && req.user!.role !== 'admin') {
+        return res.status(403).json({ message: "Only barbers and admins can delete time slots" });
+      }
+      
+      // If the user is a barber, validate they can only delete their own time slots
+      if (req.user!.role === 'barber') {
+        const barber = await storage.getBarberByUserId(req.user!.id);
+        if (!barber || barber.id !== timeSlot.barberId) {
+          return res.status(403).json({ message: "Barbers can only delete their own time slots" });
+        }
+      }
+      
+      // Check if there's an appointment using this time slot
+      // For simplicity, we'll allow deletion of blocked slots only (is booked but with no appointment = manually blocked)
+      if (!timeSlot.isBooked) {
+        return res.status(400).json({ message: "This time slot is not blocked" });
+      }
+      
+      // A real booked slot (with an appointment) shouldn't be deletable
+      // Check if there's an appointment with this timeSlot's start time
+      const appointments = await storage.getAppointments();
+      const hasAppointment = appointments.some(appointment => {
+        const appointmentDate = new Date(appointment.date);
+        const timeSlotStartTime = new Date(timeSlot.startTime);
+        
+        // If appointment date is the same as this time slot's start time
+        return (
+          appointmentDate.getFullYear() === timeSlotStartTime.getFullYear() &&
+          appointmentDate.getMonth() === timeSlotStartTime.getMonth() &&
+          appointmentDate.getDate() === timeSlotStartTime.getDate() &&
+          appointmentDate.getHours() === timeSlotStartTime.getHours() &&
+          appointmentDate.getMinutes() === timeSlotStartTime.getMinutes()
+        );
+      });
+      
+      if (hasAppointment) {
+        return res.status(400).json({ message: "Cannot delete a time slot that has an appointment" });
+      }
+      
+      // Delete the time slot
+      const deleted = await storage.deleteTimeSlot(timeSlotId);
+      if (!deleted) {
+        return res.status(500).json({ message: "Failed to delete time slot" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Delete time slot error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Endpoint to get a barber by user ID
   apiRouter.get("/barbers/by-user/:userId", authenticate, async (req, res) => {
     try {

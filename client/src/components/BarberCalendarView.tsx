@@ -59,8 +59,18 @@ const BarberCalendarView = ({
   const endHour = 18; // 6pm
   const intervalMinutes = 30; // 30-minute intervals
 
+  // Define the type for our time slot rows
+  type TimeSlotRow = {
+    time: Date;
+    endTime: Date;
+    isBooked: boolean;
+    isBlocked: boolean;
+    appointment: AppointmentWithDetails | undefined;
+    id: number | null;
+  };
+
   // Generate time slots for the selected day
-  const timeSlotRows = [];
+  const timeSlotRows: TimeSlotRow[] = [];
   for (let hour = startHour; hour < endHour; hour++) {
     for (let minute = 0; minute < 60; minute += intervalMinutes) {
       const slotTime = new Date(selectedDate);
@@ -80,7 +90,8 @@ const BarberCalendarView = ({
         );
       });
       
-      // Check if this time slot is blocked
+      // Check if this time slot is blocked and get the time slot's ID if it exists
+      let timeSlotId: number | null = null;
       const isBlocked = timeSlots.some(slot => {
         if (!slot.isBooked) return false; // Only manual blocks count as "blocked"
         
@@ -88,10 +99,16 @@ const BarberCalendarView = ({
         const slotEndTime = new Date(slot.endTime);
         
         // Check if this time slot falls within a blocked range
-        return (
+        const blocked = (
           (slotStartTime <= slotTime && slotEndTime > slotTime) || // Time slot starts during the block
           (slotTime <= slotStartTime && slotEndTime <= slotEndTime) // Block contains the time slot
         );
+        
+        if (blocked) {
+          timeSlotId = slot.id;
+        }
+        
+        return blocked;
       });
       
       // Find the appointment for this time slot (if any)
@@ -108,7 +125,8 @@ const BarberCalendarView = ({
         endTime: slotEndTime,
         isBooked,
         isBlocked,
-        appointment
+        appointment,
+        id: timeSlotId
       });
     }
   }
@@ -129,6 +147,34 @@ const BarberCalendarView = ({
         title: "Error",
         description: "Please select a start and end time",
       });
+    }
+  };
+  
+  // Mutation for unblocking a time slot
+  const unblockTimeMutation = useMutation({
+    mutationFn: async (timeSlotId: number) => {
+      await apiRequest("DELETE", `/api/time-slots/${timeSlotId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Time slot unblocked",
+        description: "The time slot has been successfully unblocked",
+      });
+      // Refetch time slots data
+      queryClient.invalidateQueries({ queryKey: [`/api/time-slots`] });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Failed to unblock time slot",
+        description: error.message || "An error occurred while unblocking the time slot",
+      });
+    }
+  });
+  
+  const handleUnblockTime = (timeSlotId: number) => {
+    if (confirm("Are you sure you want to unblock this time slot?")) {
+      unblockTimeMutation.mutate(timeSlotId);
     }
   };
 
@@ -233,18 +279,17 @@ const BarberCalendarView = ({
                         disabled={!blockStartTime}
                       >
                         <option value="">Select an end time</option>
-                        {timeSlotRows
-                          .filter(slot => 
-                            blockStartTime && 
-                            slot.time > blockStartTime && 
-                            !slot.isBooked && 
-                            !slot.isBlocked
-                          )
-                          .map((slot, i) => (
-                            <option key={i} value={slot.time.toISOString()}>
-                              {format(slot.time, 'h:mm a')}
-                            </option>
-                          ))}
+                        {/* Generate time slots after the start time regardless of booking status */}
+                        {blockStartTime && 
+                          Array.from({ length: 12 }).map((_, i) => {
+                            const endTime = new Date(blockStartTime);
+                            endTime.setMinutes(endTime.getMinutes() + ((i + 1) * 30)); // 30-minute increments
+                            return (
+                              <option key={i} value={endTime.toISOString()}>
+                                {format(endTime, 'h:mm a')}
+                              </option>
+                            );
+                          })}
                       </select>
                     </div>
                   </div>
@@ -298,8 +343,19 @@ const BarberCalendarView = ({
                       </div>
                     </div>
                   ) : slot.isBlocked ? (
-                    <div className="ml-4 flex-1 text-gray-500">
-                      Blocked
+                    <div className="ml-4 flex-1 flex justify-between items-center">
+                      <span className="text-gray-500">Blocked</span>
+                      {/* Only show unblock button if we have the slot ID */}
+                      {slot.id !== null && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-500 border-red-200 hover:bg-red-50"
+                          onClick={() => handleUnblockTime(slot.id!)}
+                        >
+                          Unblock
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     <div className="ml-4 flex-1 flex justify-between items-center">
