@@ -1,3 +1,4 @@
+
 import {
   users, User, InsertUser,
   services, Service, InsertService,
@@ -632,14 +633,21 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use PostgreSQL database
-export const storage = new DatabaseStorage();
+// Storage initialization with proper fallback
+let storage: IStorage = new MemStorage(); // Default to in-memory storage
 
-// Initialize the database with seed data
+// Initialize storage asynchronously
 (async () => {
   try {
-    await storage.seedData();
+    // Try to use PostgreSQL database first
+    const dbStorage = new DatabaseStorage();
+    await dbStorage.seedData();
+    storage = dbStorage;
+    console.log('Database storage initialized successfully');
   } catch (error) {
-    console.error('Failed to seed database:', error);
+    console.error('Failed to initialize database storage, using in-memory storage:', error);
+    // storage is already initialized to MemStorage above
   }
 })();
+
+export { storage };

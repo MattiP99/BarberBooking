@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { testConnection, initializeDatabase } from "./db";
 import { storage } from "./storage";
 import { config } from 'dotenv';
+import { initializeStorage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -50,16 +51,19 @@ app.use((req, res, next) => {
     if (dbConnected) {
       // Initialize database schema
       await initializeDatabase();
-      
+
       // Database is ready to use with our DatabaseStorage implementation
       log('Database initialized successfully');
     } else {
-      log('Failed to connect to database, falling back to in-memory storage', 'warning');
+      log('Failed to connect to database, will use fallback storage', 'warning');
     }
   } catch (error) {
     log(`Database initialization error: ${error}`, 'error');
     log('Continuing with in-memory storage', 'warning');
   }
+
+    // Initialize storage (with automatic fallback to in-memory if DB fails)
+  await initializeStorage();
 
   const server = await registerRoutes(app);
 
