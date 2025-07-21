@@ -2,6 +2,51 @@
 
 This document provides an in-depth explanation of the Barbershop Booking System application, covering both frontend and backend aspects. It's designed to help beginners understand how the entire system works, from basic concepts to advanced implementations.
 
+## Screenshots
+
+### 🏠 Home Page
+![Home Page](https://via.placeholder.com/800x600/2563eb/ffffff?text=Home+Page)
+*The elegant landing page showcasing our premium grooming services with hero section and service previews*
+
+### 👨‍💼 Men's Services
+![Men's Services](https://via.placeholder.com/800x600/2563eb/ffffff?text=Men%27s+Services)
+*Comprehensive catalog of men's grooming services including haircuts, beard styling, and traditional barbering*
+
+### 👩‍💼 Women's Services  
+![Women's Services](https://via.placeholder.com/800x600/2563eb/ffffff?text=Women%27s+Services)
+*Professional women's styling services including cuts, coloring, and blow-dry styling*
+
+### 📅 Booking Interface
+![Booking Form](https://via.placeholder.com/800x600/2563eb/ffffff?text=Booking+Form)
+*User-friendly booking system allowing clients to select services, barbers, dates, and time slots*
+
+### 👥 Meet Our Team
+![Barber Profiles](https://via.placeholder.com/800x600/2563eb/ffffff?text=Barber+Profiles)
+*Professional profiles of our skilled barbers with specialties and experience*
+
+### 🔐 Authentication
+![Login Page](https://via.placeholder.com/800x600/2563eb/ffffff?text=Login+Page)
+*Secure login system for clients and barbers*
+
+![Registration Page](https://via.placeholder.com/800x600/2563eb/ffffff?text=Registration+Page)
+*Simple registration process for new clients*
+
+### 📊 Barber Dashboard
+![Barber Dashboard](https://via.placeholder.com/800x600/2563eb/ffffff?text=Barber+Dashboard)
+*Comprehensive dashboard for barbers to manage appointments and view schedules*
+
+### 📅 Calendar Management
+![Calendar View](https://via.placeholder.com/800x600/2563eb/ffffff?text=Calendar+View)
+*Interactive calendar interface for barbers to manage availability and block time slots*
+
+### 📱 Mobile Responsive Design
+![Mobile View](https://via.placeholder.com/400x600/2563eb/ffffff?text=Mobile+View)
+*Fully responsive design optimized for mobile devices*
+
+### ⚙️ Admin Features
+![Admin Panel](https://via.placeholder.com/800x600/2563eb/ffffff?text=Admin+Panel)
+*Administrative interface for managing services, users, and system settings*
+
 ## Table of Contents
 
 1. [Introduction](#introduction)
