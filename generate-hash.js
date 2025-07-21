@@ -1,5 +1,5 @@
 
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
 async function generateHash() {
   const password = 'password123';

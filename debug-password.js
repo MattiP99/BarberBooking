@@ -1,5 +1,5 @@
 
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
 async function debugPassword() {
   const password = 'password123';
