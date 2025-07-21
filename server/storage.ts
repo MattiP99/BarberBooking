@@ -637,7 +637,7 @@ export class DatabaseStorage implements IStorage {
 let storage: IStorage = new MemStorage(); // Default to in-memory storage
 
 // Initialize storage asynchronously
-(async () => {
+const initializeStorage = async (): Promise<void> => {
   try {
     // Try to use PostgreSQL database first
     const dbStorage = new DatabaseStorage();
@@ -648,6 +648,13 @@ let storage: IStorage = new MemStorage(); // Default to in-memory storage
     console.error('Failed to initialize database storage, using in-memory storage:', error);
     // storage is already initialized to MemStorage above
   }
-})();
+};
 
+// Auto-initialize storage
+initializeStorage();
+
+// Export getter function to access current storage instance
+export const getStorage = (): IStorage => storage;
+
+// Export storage directly for backwards compatibility
 export { storage };

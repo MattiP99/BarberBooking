@@ -62,8 +62,7 @@ app.use((req, res, next) => {
     log('Continuing with in-memory storage', 'warning');
   }
 
-    // Initialize storage (with automatic fallback to in-memory if DB fails)
-  await initializeStorage();
+    // Storage is already initialized automatically in storage.ts
 
   const server = await registerRoutes(app);
 
