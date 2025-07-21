@@ -101,7 +101,7 @@ export class MemStorage implements IStorage {
     const adminUser = await this.createUser({
       username: 'admin',
       email: 'admin@barbeshop.com',
-      password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // password: password123
+      password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password123
       role: 'admin',
       fullName: 'Admin User',
       phone: '+1234567890'
@@ -111,7 +111,7 @@ export class MemStorage implements IStorage {
     const marcoUser = await this.createUser({
       username: 'marco',
       email: 'marco@barbeshop.com',
-      password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // password: password123
+      password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password123
       role: 'barber',
       fullName: 'Marco Rossi',
       phone: '+1234567891'
@@ -127,7 +127,7 @@ export class MemStorage implements IStorage {
     const lucaUser = await this.createUser({
       username: 'luca',
       email: 'luca@barbeshop.com',
-      password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // password: password123
+      password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password123
       role: 'barber',
       fullName: 'Luca Bianchi',
       phone: '+1234567892'
@@ -144,7 +144,7 @@ export class MemStorage implements IStorage {
     await this.createUser({
       username: 'customer',
       email: 'customer@example.com',
-      password: '$2b$10$Y0RE6dK2qQcvCwpLTaagm.VLah8Q4A5PGyQm3byjzs0RPyQNHcIU.', // password: password123
+      password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password123
       role: 'client',
       fullName: 'John Doe',
       phone: '+1234567893'
